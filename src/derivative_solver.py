@@ -1,11 +1,11 @@
 def solve_derivative(expression: str, variable: str = 'x') -> str:
     # # Парсинг строки
     # parser = Parser(variable=variable)
-    # ast = parser.parse(expression)
+    # ast_nodes = parser.parse(expression)
     #
     # # Дифференцирование
     # differentiator = DifferentiationVisitor(variable=variable)
-    # derivative_ast = ast.accept(differentiator)
+    # derivative_ast = ast_nodes.accept(differentiator)
     #
     # # Упрощение
     # simplifier = Simplifier()
