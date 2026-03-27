@@ -6,23 +6,18 @@ from src.ast_nodes.nodes import (
 
 
 def to_string(node) -> str:
-    """Преобразует AST в строку"""
     if isinstance(node, NumberNode):
-        # целые числа выводим без .0
         if node.value == int(node.value):
             return str(int(node.value))
         return str(node.value)
 
     elif isinstance(node, VariableNode):
-        # переменная
         return node.name
 
     elif isinstance(node, BinaryOpNode):
-        # бинарная операция
         left = to_string(node.left)
         right = to_string(node.right)
 
-        # добавляем скобки
         if _needs_parentheses(node.left, node.operator, right=False):
             left = f"({left})"
         if _needs_parentheses(node.right, node.operator, right=True):
@@ -40,14 +35,11 @@ def to_string(node) -> str:
             return f"{left}^{right}"
 
     elif isinstance(node, FunctionNode):
-        # функция
         arg = to_string(node.argument)
         return f"{node.name}({arg})"
 
     elif isinstance(node, UnaryOpNode):
-        # унарная операция
         operand = to_string(node.operand)
-        # добавляем скобки
         if isinstance(node.operand, (BinaryOpNode, FunctionNode)):
             return f"-({operand})"
         return f"-{operand}"

@@ -10,8 +10,6 @@ def main() -> None:
     while True:
         try:
             user_input = input("\n>>> ").strip()
-            if not user_input:
-                continue
 
             if user_input.lower() in ['exit', 'quit', 'q']:
                 print("До свидания!")
@@ -21,13 +19,8 @@ def main() -> None:
                 show_help()
                 continue
 
-            is_valid, error_message = is_valid_expression(user_input)
-
-            if is_valid:
-                result = solve_derivative(user_input)
-                print(f"  Производная вашей функции: {result}")
-            else:
-                print(f"  Ошибка: {error_message}")
+            result = solve_derivative(user_input)
+            print(f"  Производная вашей функции: {result}")
 
         except KeyboardInterrupt:
             print("\n\nДо свидания!")
@@ -64,45 +57,6 @@ def show_help() -> None:
         "  help, h, ?  - показать эту справку\n"
         "  exit, quit, q - выйти из программы")
     print(help_message)
-
-
-def is_valid_expression(expression: str) -> tuple[bool, str]:
-    expr = expression.replace(' ', '')
-
-    if not expr:
-        return False, "Выражение не может быть пустым"
-
-    pattern = r'^[0-9+\-*/^()x.,sincostanlnexp]+$'
-    if not re.match(pattern, expr):
-        invalid_chars = set()
-        for char in expr:
-            if not re.match(r'[0-9+\-*/^()x.,]', char) and not char.isalpha():
-                invalid_chars.add(char)
-        return False, f"Недопустимые символы"
-
-    balance = 0
-    for char in expr:
-        if char == '(':
-            balance += 1
-        elif char == ')':
-            balance -= 1
-        if balance < 0:
-            return False, "Лишняя закрывающая скобка"
-    if balance != 0:
-        return False, f"Незакрытых скобок: {balance}"
-
-    if expr[0] in '*/^':
-        return False, f"Выражение не может начинаться с оператора"
-    if expr[-1] in '+-*/^':
-        return False, f"Выражение не может заканчиваться оператором"
-
-    if re.search(r'[\+\-\*/^]{2,}', expr):
-        return False, "Два оператора подряд"
-
-    if '()' in expr:
-        return False, "Пустые скобки"
-
-    return True, ""
 
 
 if __name__ == '__main__':

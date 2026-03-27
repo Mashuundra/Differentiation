@@ -42,7 +42,41 @@ class Simplifier:
         elif isinstance(node, UnaryOpNode):
             return self._simplify_unary(node)
         elif isinstance(node, FunctionNode):
-            return FunctionNode(node.name, self._simplify_once(node.argument))
+            simplified_arg = self._simplify_once(node.argument)
+            return self._simplify_function(FunctionNode(node.name, simplified_arg))
+        return node
+
+    def _simplify_function(self, node: FunctionNode) -> ASTNode:
+        if node.name == 'ln':
+            if isinstance(node.argument, VariableNode) and node.argument.name == 'e':
+                return NumberNode(1)
+
+            if isinstance(node.argument, BinaryOpNode) and node.argument.operator == '^':
+                if isinstance(node.argument.left, VariableNode) and node.argument.left.name == 'e':
+                    return self._simplify_once(node.argument.right)
+
+            if _is_number(node.argument, 1):
+                return NumberNode(0)
+
+
+        elif node.name == 'exp':
+            if _is_number(node.argument, 0):
+                return NumberNode(1)
+
+            if _is_number(node.argument, 1):
+                return VariableNode('e')
+
+        elif node.name == 'sin':
+            if _is_number(node.argument, 0):
+                return NumberNode(0)
+
+        elif node.name == 'cos':
+            if _is_number(node.argument, 0):
+                return NumberNode(1)
+
+        if node.argument != node.argument:
+            return FunctionNode(node.name, node.argument)
+
         return node
 
     def _collect_factors(self, node, factors):
@@ -57,7 +91,6 @@ class Simplifier:
         left = self._simplify_once(node.left)
         right = self._simplify_once(node.right)
 
-        # Сложение
         if node.operator == '+':
             if _is_number(left, 0):
                 return right
@@ -68,7 +101,6 @@ class Simplifier:
             if _is_number(left) and _is_number(right):
                 return NumberNode(left.value + right.value)
 
-        # Вычитание
         elif node.operator == '-':
             if _is_number(right, 0):
                 return left
@@ -77,7 +109,6 @@ class Simplifier:
             if _is_number(left) and _is_number(right):
                 return NumberNode(left.value - right.value)
 
-        # Умножение
         elif node.operator == '*':
             if _is_unary_minus(right):
                 return UnaryOpNode('-', BinaryOpNode(left, '*', right.operand))
@@ -142,7 +173,6 @@ class Simplifier:
             if _is_number(right) and not _is_number(left):
                 return BinaryOpNode(right, '*', left)
 
-        # Деление
         elif node.operator == '/':
             if _is_number(right, 1):
                 return left
@@ -151,7 +181,6 @@ class Simplifier:
             if _is_number(left) and _is_number(right) and right.value != 0:
                 return NumberNode(left.value / right.value)
 
-        # Степень
         elif node.operator == '^':
             if _is_number(right, 1):
                 return left

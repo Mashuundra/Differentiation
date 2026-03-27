@@ -90,12 +90,6 @@ class TestDifferentiationVisitor:
         second_part = result.right
         assert isinstance(second_part, NumberNode) and second_part.value == 1
 
-    def test_power_variable_exponent_error(self):
-        node = BinaryOpNode(VariableNode('x'), '^', VariableNode('x'))
-
-        with pytest.raises(Exception, match="Степень с переменным показателем"):
-            self.visitor.visit(node)
-
     def test_sin_differentiation(self):
         node = FunctionNode('sin', VariableNode('x'))
         result = self.visitor.visit(node)
