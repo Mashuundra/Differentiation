@@ -1,4 +1,3 @@
-import re
 from derivative_solver import solve_derivative
 
 

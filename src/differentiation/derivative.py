@@ -69,8 +69,6 @@ class DifferentiationVisitor(NodeVisitor):
                 result = BinaryOpNode(power_node, '*', sum_term)
                 return result
 
-            return NumberNode(0)
-
     def visit_FunctionNode(self, node: FunctionNode) -> ASTNode:
         arg_deriv = self.visit(node.argument)
 

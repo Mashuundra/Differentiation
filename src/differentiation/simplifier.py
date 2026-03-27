@@ -74,9 +74,6 @@ class Simplifier:
             if _is_number(node.argument, 0):
                 return NumberNode(1)
 
-        if node.argument != node.argument:
-            return FunctionNode(node.name, node.argument)
-
         return node
 
     def _collect_factors(self, node, factors):
