@@ -19,7 +19,7 @@ def main() -> None:
                 continue
 
             result = solve_derivative(user_input)
-            print(f"  Производная вашей функции: {result}")
+            print(f"  diff({user_input}, x) -> {result}")
 
         except KeyboardInterrupt:
             print("\n\nДо свидания!")
