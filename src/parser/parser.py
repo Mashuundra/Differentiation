@@ -1,23 +1,24 @@
 """Синтаксический анализатор математических выражений."""
 
 from typing import List, Optional
-from src.ast_nodes import (
+from ..ast_nodes import (
     ASTNode, NumberNode, VariableNode, BinaryOpNode,
     UnaryOpNode, FunctionNode
 )
-from src.parser.exceptions import (
+from .exceptions import (
     InvalidExpressionError, UnexpectedTokenError
 )
+
 
 class Token:
     """Токен лексического анализатора."""
 
-    def __init__(self, type_: str, value: str, position: int):
-        self.type = type_  # 'NUMBER', 'VARIABLE', 'OPERATOR', 'FUNCTION', 'LPAREN', 'RPAREN'
-        self.value = value  # значение токена
-        self.position = position  # позиция в строке
+    def __init__(self, type_: str, value: str, position: int) -> None:
+        self.type: str = type_
+        self.value: str = value
+        self.position: int = position
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Token({self.type}, {self.value}, pos={self.position})"
 
 
@@ -25,17 +26,14 @@ class Tokenizer:
     """Лексический анализатор.
     Преобразование строки в список токенов"""
 
-    def __init__(self, expression: str, variable: str = 'x'):
-        self.expression = expression
-        self.variable = variable
-        self.position = 0
-        self.tokens = []
+    def __init__(self, expression: str, variable: str = 'x') -> None:
+        self.expression: str = expression
+        self.variable: str = variable
+        self.position: int = 0
+        self.tokens: List[Token] = []
 
-        # Функции, которые поддерживаются, можно расширить
-        self.functions = {'sin', 'cos', 'tan', 'ln', 'exp'}
-
-        # Операторы
-        self.operators = {'+', '-', '*', '/', '^'}
+        self.functions: set[str] = {'sin', 'cos', 'tan', 'ln', 'exp'}
+        self.operators: set[str] = {'+', '-', '*', '/', '^'}
 
     def tokenize(self) -> List[Token]:
         """Разбивает выражение на токены."""
@@ -45,7 +43,6 @@ class Tokenizer:
         while self.position < len(self.expression):
             char = self.expression[self.position]
 
-            # Пропускаем пробелы
             if char.isspace():
                 self.position += 1
                 continue
@@ -139,21 +136,20 @@ class Tokenizer:
         # Проверяем, является ли идентификатор функцией
         if identifier in self.functions:
             return Token('FUNCTION', identifier, start_pos)
-        # Иначе считаем его переменной
         else:
             return Token('VARIABLE', identifier, start_pos)
+
 
 class Parser:
     """Синтаксический анализатор."""
 
-    def __init__(self, variable: str = 'x'):
-        self.variable = variable
+    def __init__(self, variable: str = 'x') -> None:
+        self.variable: str = variable
         self.tokens: List[Token] = []
-        self.position = 0
+        self.position: int = 0
 
     def parse(self, expression: str) -> ASTNode:
         """Разбирает выражение и возвращает AST."""
-        # Токенизация
         tokenizer = Tokenizer(expression, self.variable)
         self.tokens = tokenizer.tokenize()
         self.position = 0
@@ -161,13 +157,12 @@ class Parser:
         if not self.tokens:
             raise InvalidExpressionError("Выражение не может быть пустым")
 
-        # Парсинг выражения
         result = self._parse_expression()
 
-        # Проверяем, что все токены обработаны
         if self.position < len(self.tokens):
+            token = self.current_token()
             raise UnexpectedTokenError(
-                f"Неожиданный токен '{self.current_token().value}' на позиции {self.current_token().position}"
+                f"Неожиданный токен '{token.value}' на позиции {token.position}"
             )
 
         return result
@@ -232,14 +227,15 @@ class Parser:
         return node
 
     def _parse_factor(self) -> ASTNode:
-        """Разбирает фактор (приоритет: ^)."""
+        """Разбирает фактор с учетом приоритета степени и неявного умножения."""
         node = self._parse_power()
 
-        # Обработка неявного умножения (например, 2x, x(x+1))
         while True:
             next_token = self.current_token()
-            if next_token and (next_token.type in ('NUMBER', 'VARIABLE', 'LPAREN', 'FUNCTION')):
-                # Неявное умножение: a b → a * b
+            if next_token and next_token.type in ('NUMBER', 'VARIABLE', 'LPAREN', 'FUNCTION'):
+                # Проверяем, не является ли предыдущий узел степенью
+                if isinstance(node, BinaryOpNode) and node.operator == '^':
+                    break
                 right = self._parse_power()
                 node = BinaryOpNode(node, '*', right)
             else:
@@ -249,26 +245,37 @@ class Parser:
 
     def _parse_power(self) -> ASTNode:
         """Разбирает степень (правый ассоциативный)."""
+
         node = self._parse_unary()
 
         token = self.current_token()
         if token and token.type == 'OPERATOR' and token.value == '^':
             self.position += 1
-            right = self._parse_power()  # правый ассоциативный
+            # Рекурсивный вызов для правой части - это обеспечивает правую ассоциативность
+            right = self._parse_power()
             node = BinaryOpNode(node, '^', right)
 
         return node
 
     def _parse_unary(self) -> ASTNode:
         """Разбирает унарные операторы (+ и -)."""
+
         token = self.current_token()
 
         if token and token.type == 'OPERATOR' and token.value in ('+', '-'):
             operator = token.value
             self.position += 1
+
+            next_token = self.current_token()
+            if next_token and next_token.type == 'OPERATOR' and next_token.value in ('+', '-'):
+                raise InvalidExpressionError(
+                    f"Некорректная последовательность операторов '{operator}{next_token.value}' "
+                    f"на позиции {next_token.position}"
+                )
+
             operand = self._parse_unary()
             if operator == '+':
-                return operand  # унарный плюс ничего не меняет
+                return operand
             else:
                 return UnaryOpNode('-', operand)
 
