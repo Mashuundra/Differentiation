@@ -161,9 +161,10 @@ class Parser:
 
         if self.position < len(self.tokens):
             token = self.current_token()
-            raise UnexpectedTokenError(
-                f"Неожиданный токен '{token.value}' на позиции {token.position}"
-            )
+            if token is not None:  # проверка
+                raise UnexpectedTokenError(
+                    f"Неожиданный токен '{token.value}' на позиции {token.position}"
+                )
 
         return result
 

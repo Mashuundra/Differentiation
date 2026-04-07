@@ -1,6 +1,5 @@
 """Тесты для AST узлов и Visitor паттерна."""
 
-import pytest
 from src.ast_nodes import (
     NumberNode, VariableNode, BinaryOpNode, UnaryOpNode, FunctionNode
 )

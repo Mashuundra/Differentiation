@@ -1,6 +1,5 @@
 """ Тесты для модуля упрощения выражений """
 
-import pytest
 from src.ast_nodes.nodes import (
     NumberNode, VariableNode, BinaryOpNode, UnaryOpNode, FunctionNode
 )

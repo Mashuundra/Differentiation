@@ -58,7 +58,6 @@ class Simplifier:
             if _is_number(node.argument, 1):
                 return NumberNode(0)
 
-
         elif node.name == 'exp':
             if _is_number(node.argument, 0):
                 return NumberNode(1)
@@ -134,7 +133,8 @@ class Simplifier:
                     number *= f.value
                 elif _is_variable(f):
                     vars_dict[f.name] = vars_dict.get(f.name, 0) + 1
-                elif isinstance(f, BinaryOpNode) and f.operator == '^' and _is_variable(f.left) and _is_number(f.right):
+                elif (isinstance(f, BinaryOpNode) and f.operator == '^'
+                      and _is_variable(f.left) and _is_number(f.right)):
                     vars_dict[f.left.name] = vars_dict.get(f.left.name, 0) + f.right.value
                 else:
                     other_factors.append(f)

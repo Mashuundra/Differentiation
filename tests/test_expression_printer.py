@@ -1,6 +1,5 @@
 """ Тесты для преобразования AST в строку """
 
-import pytest
 from src.ast_nodes.nodes import (
     NumberNode, VariableNode, BinaryOpNode, FunctionNode, UnaryOpNode
 )
