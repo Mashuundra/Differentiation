@@ -3,7 +3,7 @@ from src.differentiation import DifferentiationVisitor, Simplifier
 from src.utils import to_string
 
 
-def solve_derivative(expression: str, variable: str = 'x') -> str:
+def solve_derivative(expression: str, variable: str) -> str:
     # Парсинг строки
     parser = Parser(variable=variable)
     ast_nodes = parser.parse(expression)
