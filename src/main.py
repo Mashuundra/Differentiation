@@ -18,8 +18,14 @@ def main() -> None:
                 show_help()
                 continue
 
-            result = solve_derivative(user_input)
-            print(f"  Производная вашей функции: {result}")
+            print("Введите переменную интегрирования (по умолчанию x):")
+            variable = input().strip()
+
+            if not variable:
+                variable = 'x'
+
+            result = solve_derivative(user_input, variable)
+            print(f"  diff({user_input}, {variable}) -> {result}")
 
         except KeyboardInterrupt:
             print("\n\nДо свидания!")

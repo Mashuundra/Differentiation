@@ -1,7 +1,6 @@
 """Базовый класс Visitor для обхода AST."""
-# Реализует паттерн Visitor для обхода дерева
 
-from src.ast_nodes.nodes import ASTNode
+from .nodes import ASTNode  # относительный импорт вместо абсолютного
 
 
 class NodeVisitor:
@@ -11,7 +10,7 @@ class NodeVisitor:
         """Посещает узел и вызывает соответствующий метод."""
         method_name = f'visit_{type(node).__name__}'
         visitor = getattr(self, method_name, self.generic_visit)
-        return visitor(node) # вызов найденного метода у узла
+        return visitor(node)  # вызов найденного метода у узла
 
     def generic_visit(self, node: ASTNode):
         """Общий метод посещения для неподдерживаемых узлов."""

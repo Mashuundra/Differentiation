@@ -1,10 +1,9 @@
 """ Тесты для модуля дифференцирования """
 
-import pytest
 from src.ast_nodes.nodes import (
     NumberNode, VariableNode, BinaryOpNode, FunctionNode, UnaryOpNode
 )
-from src.differentiation import DifferentiationVisitor, Simplifier
+from src.differentiation import DifferentiationVisitor
 
 
 class TestDifferentiationVisitor:

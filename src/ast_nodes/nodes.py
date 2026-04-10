@@ -10,7 +10,7 @@ class ASTNode:
     pass
 
 
-@dataclass # автоматическое создание __init__, __eq__, __hash__
+@dataclass  # автоматическое создание __init__, __eq__, __hash__
 class NumberNode(ASTNode):
     """Узел для числовой константы.
      Представляет числа в выражении"""
